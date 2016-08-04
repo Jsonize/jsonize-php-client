@@ -17,6 +17,8 @@ class InstanceJsonize extends StreamedJsonize {
 			),
 			$pipes
 		);
+		if (!is_resource($this->process))
+			throw new JsonizeErrorException($path . " --instance " . $params, 1);
 		stream_set_blocking($pipes[0], false);
 		stream_set_blocking($pipes[1], false);
 		stream_set_blocking($pipes[2], false);

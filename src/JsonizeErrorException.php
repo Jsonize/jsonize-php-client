@@ -2,7 +2,7 @@
 
 namespace Jsonize;
 
-class JsonizeErrorException extends Exception {
+class JsonizeErrorException extends \Exception {
 	
 	private $error;
 	private $json;
@@ -10,7 +10,7 @@ class JsonizeErrorException extends Exception {
 	public function __construct($error, $json) {
 		$this->error = $error;
 		$this->json = $json;
-        parent::__construct();
+        parent::__construct(json_encode($this->error()) . " : " . json_encode($this->json()));
     }
     
     public function error() {
