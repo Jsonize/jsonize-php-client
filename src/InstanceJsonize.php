@@ -27,11 +27,14 @@ class InstanceJsonize extends StreamedJsonize {
 		$this->errorStream = $pipes[2];
 	}
 	
-	public function __destruct() {
+	public function destroy() {
+		if (!$this->process)
+			return;
 		fclose($this->readStream);
 		fclose($this->writeStream);
 		fclose($this->errorStream);
 		proc_close($this->process);
+		$this->process = NULL;
 	}
 
 }

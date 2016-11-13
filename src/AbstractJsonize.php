@@ -4,6 +4,15 @@ namespace Jsonize;
 
 abstract class AbstractJsonize {
 	
+	public abstract function destroy();
+	
+	private $once = FALSE;
+	
+	public function __construct($options = array()) {
+		if (isset($options["once"]))
+			$this->once = $options["once"];
+	}
+	
 	// Reads a single JSON or returns NULL
 	protected abstract function receive();
 	
@@ -35,8 +44,20 @@ abstract class AbstractJsonize {
 		));
 	}
 	
+	public function serverError($e) {
+		if ($this->once)
+			$this->destroy();
+		foreach ($this->openTransactions as $transactionId => $transaction)
+			$this->receiveError($transactionId, $transaction, $e);
+	}
+	
 	public function receiveNext() {
-		$result = $this->receive();
+		try {
+			$result = $this->receive();
+		} catch (JsonizeServerException $e) {
+			$this->serverError($e);
+			return FALSE;
+		}
 		if (!@$result)
 			return FALSE;
 		$transactionId = $result["transaction"];
@@ -51,6 +72,8 @@ abstract class AbstractJsonize {
 			$this->receiveError($transactionId, $transaction, $payload);
 		else if ($type === "success")
 			$this->receiveSuccess($transactionId, $transaction, $payload);
+		if ($this->once)
+			$this->destroy();
 		return TRUE;
 	}
 	
@@ -77,9 +100,9 @@ abstract class AbstractJsonize {
 	}
 	
 	public function wait($transactionId, $timeout = NULL) {
-		$endtime = $timeout === NULL ? NULL : (time() + $timeout);
+		$endtime = $timeout === NULL ? NULL : (microtime(TRUE) * 1000 + $timeout);
 		while (@$this->openTransactions[$transactionId]) {
-			if ($endtime !== NULL && $endtime < time())
+			if ($endtime !== NULL && $endtime < microtime(TRUE) * 1000)
 				return FALSE;
 			$this->receiveNext();
 			usleep(100);
@@ -100,9 +123,11 @@ abstract class AbstractJsonize {
 			"event" => $event
 		));
 		$this->wait($transactionId, $timeout);
-		if ($success)
+		if (@$success)
 			return $success;
-		if ($error)
+		if (@$error && is_object($error) && $error instanceof JsonizeException)
+			throw $error;
+		if (@$error)
 			throw new JsonizeErrorException($error, $json);
 		$this->terminate($transactionId);
 		throw new JsonizeTimeoutException($timeout, $json);

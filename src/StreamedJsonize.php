@@ -15,7 +15,10 @@ abstract class StreamedJsonize extends AbstractJsonize {
 			return NULL;
 		$head = substr($this->cache, 0, $i);
 		$this->cache = substr($this->cache, $i + 1);
-		return json_decode($head, TRUE);
+		$result = json_decode($head, TRUE);
+		if (!@$result)
+			throw new JsonizeServerException();
+		return $result;
 	}
 	
 	protected function send($json) {

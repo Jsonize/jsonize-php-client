@@ -2,7 +2,7 @@
 
 namespace Jsonize;
 
-class JsonizeErrorException extends \Exception {
+class JsonizeErrorException extends JsonizeException {
 	
 	private $error;
 	private $json;

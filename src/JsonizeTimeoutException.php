@@ -2,7 +2,7 @@
 
 namespace Jsonize;
 
-class JsonizeTimeoutException extends \Exception {
+class JsonizeTimeoutException extends JsonizeException {
 	
 	private $timeout;
 	private $json;
@@ -10,7 +10,7 @@ class JsonizeTimeoutException extends \Exception {
 	public function __construct($timeout, $json) {
 		$this->timeout = $timeout;
 		$this->json = $json;
-        parent::__construct(json_encode($this->error()) . " : " . json_encode($this->json()));
+        parent::__construct("Timeout" . " : " . json_encode($this->json()));
     }
     
     public function timeout() {
