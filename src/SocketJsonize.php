@@ -14,7 +14,7 @@ class SocketJsonize extends StreamedJsonize {
 		stream_set_blocking($this->socket, false);
 	}
 	
-	protected function destroy() {
+	public function destroy() {
 		if (!$this->socket)
 			return;
 		fclose($this->socket);

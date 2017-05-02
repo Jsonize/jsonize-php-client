@@ -1,7 +1,7 @@
 {
   "name": "jsonize/jsonize-php-client",
   "description": "This is the Jsonize Php Client.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "Apache-2.0",
   "require" : {
       "php": ">=5.3.0"
