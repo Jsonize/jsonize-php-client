@@ -72,8 +72,6 @@ abstract class AbstractJsonize {
 			$this->receiveError($transactionId, $transaction, $payload);
 		else if ($type === "success")
 			$this->receiveSuccess($transactionId, $transaction, $payload);
-		if ($this->once)
-			$this->destroy();
 		return TRUE;
 	}
 	
@@ -86,12 +84,16 @@ abstract class AbstractJsonize {
 		if (@$transaction["callbacks"]["error"])
 			$transaction["callbacks"]["error"]($payload);
 		unset($this->openTransactions[$transactionId]);
+		if ($this->once)
+			$this->destroy();
 	}
 	
 	private function receiveSuccess($transactionId, $transaction, $payload) {
 		if (@$transaction["callbacks"]["success"])
 			$transaction["callbacks"]["success"]($payload);
 		unset($this->openTransactions[$transactionId]);
+		if ($this->once)
+			$this->destroy();
 	}
 	
 	public function receiveAll() {
