@@ -1,4 +1,4 @@
-# jsonize-php-client 0.0.4
+# jsonize-php-client
 
 This is the Jsonize Php Client.
 
